@@ -1,4 +1,4 @@
-package com.hitachivantara.udpsender;
+package org.ggraham.udpsender;
 
 
 import org.eclipse.swt.SWT;
@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.ggraham.message.PacketDecoder;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.Props;
 import org.pentaho.di.core.row.ValueMetaInterface;
@@ -37,8 +38,6 @@ import org.pentaho.di.ui.core.widget.ColumnInfo;
 import org.pentaho.di.ui.core.widget.TableView;
 import org.pentaho.di.ui.core.widget.TextVar;
 import org.pentaho.di.ui.trans.step.BaseStepDialog;
-
-import com.hitachivantara.message.PacketDecoder;
 
 import java.util.ArrayList;
 import java.util.List;

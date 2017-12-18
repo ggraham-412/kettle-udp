@@ -1,5 +1,6 @@
-package com.hitachivantara.udpsender;
+package org.ggraham.udpreceiver;
 
+import org.ggraham.message.PacketDecoder;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.annotations.Step;
 import org.pentaho.di.core.database.DatabaseMeta;
@@ -25,24 +26,25 @@ import org.pentaho.di.trans.step.StepMetaInterface;
 import org.pentaho.metastore.api.IMetaStore;
 import org.w3c.dom.Node;
 
-import com.hitachivantara.message.PacketDecoder;
-
 import java.util.ArrayList;
 import java.util.List;
 
-@Step( id = "UDPSenderMeta", 
-    image = "UDPSenderIcon.svg", 
-    name = "UDPSenderStep.Name", 
-    description = "Send UDP packets", 
-    i18nPackageName = "com.hitachivantara.udpsender",
-    categoryDescription = "i18n:org.pentaho.di.trans.step:BaseStep.Category.Output" ) 
-public class UDPSenderMeta
+@Step( id = "UDPReceiverMeta", 
+    image = "UDPReceiverIcon.svg", 
+    name = "UDPReceiverStep.Name", 
+    description = "Receive and process UDP packets", 
+    i18nPackageName = "com.hitachivantara.udpreceiver",
+    categoryDescription = "i18n:org.pentaho.di.trans.step:BaseStep.Category.Input" ) 
+public class UDPReceiverMeta
     extends BaseStepMeta implements StepMetaInterface {
 
-  public static Class<?> PKG = UDPSenderMeta.class;
+  public static Class<?> PKG = UDPReceiverMeta.class;
   
   private String m_address = "localhost";
   private String m_port = "0";
+  private String m_executeMaxPackets = "0";
+  private String m_executeForDuration = "0";
+  private String m_bufferSize = "512";
   private String m_initPoolSize = "100";
   private String m_maxPoolSize = "200";
   private String m_bigEndian = (new Boolean(true)).toString();
@@ -74,6 +76,24 @@ public class UDPSenderMeta
 	  }
   }
   
+  public String getBufferSize() {
+  	  return m_bufferSize;
+  }
+  public void setBufferSize(String bufferSize) {
+	  m_bufferSize = bufferSize;
+  }
+  public String getInitPoolSize() {
+	  return m_initPoolSize;
+  }
+  public void setInitPoolSize(String initPoolSize) {
+	  m_initPoolSize = initPoolSize;
+  }
+  public String getMaxPoolSize() {
+	  return m_maxPoolSize;
+  }
+  public void setMaxPoolSize(String maxPoolSize) {
+	  m_maxPoolSize = maxPoolSize;
+  }
   public String getAddress() {
 	  return m_address;
   }
@@ -88,18 +108,6 @@ public class UDPSenderMeta
 	  m_port = portNum;
   }
 
-  public String getInitPoolSize() {
-	  return m_initPoolSize;
-  }
-  public void setInitPoolSize(String initPoolSize) {
-	  m_initPoolSize = initPoolSize;
-  }
-  public String getMaxPoolSize() {
-	  return m_maxPoolSize;
-  }
-  public void setMaxPoolSize(String maxPoolSize) {
-	  m_maxPoolSize = maxPoolSize;
-  }
   public boolean getBigEndian() {
 	  return Boolean.parseBoolean(m_bigEndian);
   }
@@ -107,11 +115,28 @@ public class UDPSenderMeta
 	  m_bigEndian = (new Boolean(endian)).toString();
   }
   
+  public String getMaxPackets() {
+	  return m_executeMaxPackets;
+  }
+  public void setMaxPackets(String maxPackets) {
+	  m_executeMaxPackets = maxPackets;
+  }
+
+  public String getMaxDuration() {
+	  return m_executeForDuration;
+  }
+  public void setMaxDuration(String maxDuration) {
+	  m_executeForDuration = maxDuration;
+  }
+
   
   
   @Override public void setDefault() {
+      m_executeForDuration = "0";
+      m_executeMaxPackets = "0";
       m_port = "0";
       m_address = "localHost";
+      m_bufferSize = "512";
       m_initPoolSize = "100";
       m_maxPoolSize = "512";
       m_bigEndian = (new Boolean(true)).toString();
@@ -122,17 +147,20 @@ public class UDPSenderMeta
   @Override
   public StepInterface getStep( StepMeta stepMeta, StepDataInterface stepDataInterface, int i, TransMeta transMeta,
       Trans trans ) {
-    return new UDPSenderStep( stepMeta, stepDataInterface, i, transMeta, trans );
+    return new UDPReceiverStep( stepMeta, stepDataInterface, i, transMeta, trans );
   }
 
   @Override public StepDataInterface getStepData() {
-    return new UDPSenderData();
+    return new UDPReceiverData();
   }
 
   @Override public void loadXML( Node stepnode, List<DatabaseMeta> databases, IMetaStore metaStore )
       throws KettleXMLException {
 	  m_address = XMLHandler.getTagValue( stepnode, "ADDRESS" );
 	  m_port = XMLHandler.getTagValue( stepnode, "PORT" );
+	  m_executeForDuration = XMLHandler.getTagValue( stepnode, "DURATION");
+	  m_executeMaxPackets = XMLHandler.getTagValue( stepnode, "MAXPACKETS");	
+	  m_bufferSize = XMLHandler.getTagValue( stepnode, "BUFFERSIZE");	
 	  m_initPoolSize = XMLHandler.getTagValue( stepnode, "INITPOOLSIZE");	
 	  m_maxPoolSize = XMLHandler.getTagValue( stepnode, "MAXPOOLSIZE");	
 	  m_bigEndian = XMLHandler.getTagValue(stepnode,  "BIG_ENDIAN");
@@ -154,6 +182,15 @@ public class UDPSenderMeta
       }
     if ( !Const.isEmpty( m_port ) ) {
         retval.append( "    " ).append( XMLHandler.addTagValue( "PORT", m_port ) );
+      }
+    if ( !Const.isEmpty( m_executeForDuration ) ) {
+        retval.append( "    " ).append( XMLHandler.addTagValue( "DURATION", m_executeForDuration ) );
+      }
+    if ( !Const.isEmpty( m_executeMaxPackets ) ) {
+        retval.append( "    " ).append( XMLHandler.addTagValue( "MAXPACKETS", m_executeMaxPackets ) );
+      }
+    if ( !Const.isEmpty( m_bufferSize ) ) {
+        retval.append( "    " ).append( XMLHandler.addTagValue( "BUFFERSIZE", m_bufferSize ) );
       }
     if ( !Const.isEmpty( m_initPoolSize ) ) {
         retval.append( "    " ).append( XMLHandler.addTagValue( "INITPOOLSIZE", m_initPoolSize ) );
@@ -181,6 +218,9 @@ public class UDPSenderMeta
       throws KettleException {
 	    m_address = rep.getStepAttributeString( stepId, "ADDRESS" );
 	    m_port = rep.getStepAttributeString( stepId, "PORT" );
+	    m_executeForDuration = rep.getStepAttributeString( stepId, "DURATION" );
+	    m_executeMaxPackets = rep.getStepAttributeString( stepId, "MAXPACKETS" );    
+	    m_bufferSize = rep.getStepAttributeString( stepId, "BUFFERSIZE" );    
 	    m_initPoolSize = rep.getStepAttributeString( stepId, "INITPOOLSIZE" );    
 	    m_maxPoolSize = rep.getStepAttributeString( stepId, "MAXPOOLSIZE" );    
 	    m_bigEndian = rep.getStepAttributeString( stepId, "BIG_ENDIAN" );    
@@ -201,6 +241,15 @@ public class UDPSenderMeta
 	      }
 	    if ( !Const.isEmpty( m_port ) ) {
 	        rep.saveStepAttribute( transformationId, stepId, "PORT", m_port );
+	      }
+	    if ( !Const.isEmpty( m_executeForDuration ) ) {
+	        rep.saveStepAttribute( transformationId, stepId, "DURATION", m_executeForDuration );
+	      }
+	    if ( !Const.isEmpty( m_executeMaxPackets ) ) {
+	        rep.saveStepAttribute( transformationId, stepId, "MAXPACKETS", m_executeMaxPackets );
+	      }
+	    if ( !Const.isEmpty( m_bufferSize ) ) {
+	        rep.saveStepAttribute( transformationId, stepId, "BUFFERSIZE", m_bufferSize );
 	      }
 	    if ( !Const.isEmpty( m_initPoolSize ) ) {
 	        rep.saveStepAttribute( transformationId, stepId, "INITPOOLSIZE", m_initPoolSize );
