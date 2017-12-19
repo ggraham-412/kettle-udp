@@ -28,7 +28,6 @@ SOFTWARE.
 import org.ggraham.message.PacketDecoder;
 import org.ggraham.network.UDPReceiver;
 import org.ggraham.network.UDPSender;
-import org.ggraham.network.UDPSender__;
 import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.core.row.ValueMetaInterface;
 import org.pentaho.di.trans.step.BaseStepData;
