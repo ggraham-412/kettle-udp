@@ -61,6 +61,13 @@ import java.util.List;
     description = "Send UDP packets", 
     i18nPackageName = "com.hitachivantara.udpsender",
     categoryDescription = "i18n:org.pentaho.di.trans.step:BaseStep.Category.Output" ) 
+/**
+ * 
+ * Implements StepMetaInterface
+ * 
+ * @author ggraham
+ *
+ */
 public class UDPSenderMeta
     extends BaseStepMeta implements StepMetaInterface {
 

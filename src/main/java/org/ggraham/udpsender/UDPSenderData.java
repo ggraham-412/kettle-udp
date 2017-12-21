@@ -37,10 +37,23 @@ import org.pentaho.di.trans.steps.userdefinedjavaclass.FieldHelper;
 import java.util.Date;
 import java.util.HashMap;
 
+/**
+ * 
+ * Implements the PDI StepDataInterface
+ * 
+ * @author ggraham
+ *
+ */
 public class UDPSenderData extends BaseStepData implements StepDataInterface {
- 
-  HashMap<Integer, Integer> m_fieldMap;
-  protected RowMetaInterface m_inputRowMeta;
-  protected UDPSender m_sender;
-  protected PacketDecoder m_decoder;
+
+	// For input row meta
+	protected RowMetaInterface m_inputRowMeta;
+
+	// UDP Sender and packet encoder 
+	protected UDPSender m_sender;
+	protected PacketDecoder m_decoder;
+	
+	// Allows for dynamic re-ordering of fields so that row order 
+	// does not have to match the field order in the packet
+	HashMap<Integer, Integer> m_fieldMap;
 }

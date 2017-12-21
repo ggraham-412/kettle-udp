@@ -60,6 +60,13 @@ import java.util.List;
     description = "Receive and process UDP packets", 
     i18nPackageName = "com.hitachivantara.udpreceiver",
     categoryDescription = "i18n:org.pentaho.di.trans.step:BaseStep.Category.Input" ) 
+/**
+ * 
+ * Implements StepMetaInterface
+ * 
+ * @author ggraham
+ *
+ */
 public class UDPReceiverMeta
     extends BaseStepMeta implements StepMetaInterface {
 

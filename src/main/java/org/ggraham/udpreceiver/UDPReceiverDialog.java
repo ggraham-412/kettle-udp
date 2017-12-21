@@ -67,6 +67,13 @@ import org.pentaho.di.ui.trans.step.BaseStepDialog;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 
+ * Implements StepDialogInterface
+ * 
+ * @author ggraham
+ *
+ */
 public class UDPReceiverDialog extends BaseStepDialog implements StepDialogInterface {
 
  protected UDPReceiverMeta m_subscriberMeta;
