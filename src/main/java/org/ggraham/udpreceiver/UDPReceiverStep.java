@@ -1,35 +1,10 @@
 package org.ggraham.udpreceiver;
 
-/*
-
-MIT License
-
-Copyright (c) [2017] [Gregory Graham]
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-*/
-
-import org.ggraham.message.IHandleMessage;
-import org.ggraham.message.PacketDecoder;
-import org.ggraham.network.UDPReceiver;
-import org.ggraham.networksenderreceiver.PackageService;
+import org.ggraham.ggutils.logging.DefaultLogger;
+import org.ggraham.nsr.PackageService;
+import org.ggraham.nsr.message.IHandleMessage;
+import org.ggraham.nsr.message.PacketDecoder;
+import org.ggraham.nsr.network.UDPReceiver;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.exception.KettlePluginException;
@@ -139,12 +114,11 @@ public class UDPReceiverStep extends BaseStep implements StepInterface {
 		if (super.init(smi, sdi)) {
 
 			logBasic("Running UDPReceiver init()...");
-			
-			// 
-			PackageService.GetImpl().setLoggerImpl(new PackageService.DefaultLogger() {
+			final BaseStep bStep = this;
+			PackageService.getPackageService().setLogImpl(new DefaultLogger() {
 				@Override
-				protected void doLog(String message) {
-					logBasic(message);
+				protected void doLog(String source, String message, int setLevel, int logLevel, String sLogLevel) {
+				    bStep.logBasic(message);
 				}
 			});
 
@@ -222,7 +196,9 @@ public class UDPReceiverStep extends BaseStep implements StepInterface {
 			data.m_decoder = new PacketDecoder();
 			for (PacketDecoder.PacketFieldConfig f : meta.getFields()) {
 				data.m_decoder.addField(f);
+				logBasic("  Adding field: " + f.toString());
 			}
+			logBasic("Big endian: " + meta.getBigEndian());
 			data.m_receiver = new UDPReceiver(address, port, meta.getBigEndian(), new HandlerCallback(meta, data));
 			logBasic("Created receiver " + (data.m_receiver != null));
 
@@ -287,9 +263,9 @@ public class UDPReceiverStep extends BaseStep implements StepInterface {
 		public boolean handleMessage(ByteBuffer message) {
 			Object[] outRow = RowDataUtil.allocateRowData(m_data.m_outputRowMeta.size());
 			try {
-
 				m_data.m_decoder.DecodePacket(message, outRow);
 			} catch (Exception ex) {
+				logBasic("Caught exception in decoder: " + ex.toString());
 				return false;
 			}
 			try {

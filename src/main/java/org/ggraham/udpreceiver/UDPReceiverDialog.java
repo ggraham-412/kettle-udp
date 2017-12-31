@@ -50,7 +50,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
-import org.ggraham.message.PacketDecoder;
+import org.ggraham.nsr.message.PacketDecoder;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.Props;
 import org.pentaho.di.core.row.ValueMetaInterface;
@@ -568,7 +568,9 @@ public class UDPReceiverDialog extends BaseStepDialog implements StepDialogInter
        TableItem item = new TableItem( table, SWT.NONE );
        item.setText( 1, fieldNames[i].trim() );
        item.setText( 2, fields[i].getFieldType().toString() );
-       item.setText( 3, fields[i].getEncoding().trim() );
+       String encoding = fields[i].getEncoding();
+       if ( encoding == null ) encoding = "";
+       item.setText( 3, encoding.trim() );
      }
 
      m_wFieldsTable.removeEmptyRows();

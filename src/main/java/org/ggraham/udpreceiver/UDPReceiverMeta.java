@@ -25,7 +25,7 @@ SOFTWARE.
 
 */
 
-import org.ggraham.message.PacketDecoder;
+import org.ggraham.nsr.message.PacketDecoder;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.annotations.Step;
 import org.pentaho.di.core.database.DatabaseMeta;

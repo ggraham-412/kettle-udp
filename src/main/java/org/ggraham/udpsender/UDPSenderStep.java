@@ -28,9 +28,13 @@ SOFTWARE.
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 
-import org.ggraham.message.PacketDecoder;
-import org.ggraham.network.UDPSender;
-import org.ggraham.objectpool.ObjectPool.PoolItem;
+import org.ggraham.ggutils.logging.DefaultLogger;
+import org.ggraham.ggutils.objectpool.ObjectPool.PoolItem;
+import org.ggraham.nsr.PackageService;
+import org.ggraham.nsr.message.PacketDecoder;
+import org.ggraham.nsr.message.PacketDecoder.FieldType;
+import org.ggraham.nsr.message.PacketDecoder.PacketFieldConfig;
+import org.ggraham.nsr.network.UDPSender;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.i18n.BaseMessages;
@@ -84,13 +88,28 @@ public class UDPSenderStep extends BaseStep implements StepInterface {
 				for (int ii = 0; ii < fieldNames.length; ii++) {
 					uData.m_fieldMap.put(ii, uData.m_inputRowMeta.indexOfValue(fieldNames[ii]));
 				}
+				final BaseStep bStep = this;
+				PackageService.getPackageService().setLogImpl(new DefaultLogger() {
+					@Override
+					protected void doLog(String source, String message, int setLevel, int logLevel, String sLogLevel) {
+					    bStep.logBasic(message);
+					}
+				});
 				configureConnection(uMeta, uData);
 			}
 
 			String[] fieldNames = uMeta.getFieldNames();
+			PacketFieldConfig[] fieldConfig = uMeta.getFields();
 			Object[] toSend = new Object[fieldNames.length];
 			for (int ii = 0; ii < fieldNames.length; ii++) {
-				toSend[ii] = row[uData.m_fieldMap.get(ii)];
+				if ( fieldConfig[ii].getFieldType() == FieldType.INTEGER ) {
+				    toSend[ii] = (int)(long)row[uData.m_fieldMap.get(ii)];
+				} else	if ( fieldConfig[ii].getFieldType() == FieldType.FLOAT ) {
+				    toSend[ii] = (float)(double)row[uData.m_fieldMap.get(ii)];					
+				} else {
+				    toSend[ii] = row[uData.m_fieldMap.get(ii)];										
+				}
+				
 			}
 
 			PoolItem<ByteBuffer> pBuffer = uData.m_sender.getByteBuffer();
