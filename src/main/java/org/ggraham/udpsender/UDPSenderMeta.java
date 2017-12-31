@@ -1,5 +1,14 @@
 package org.ggraham.udpsender;
 
+	/*
+	 * 
+	 * Apache License 2.0 
+	 * 
+	 * Copyright (c) [2017] [Gregory Graham]
+	 * 
+	 * See LICENSE.txt for details.
+	 * 
+	 */
 import org.ggraham.nsr.message.PacketDecoder;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.annotations.Step;

@@ -1,5 +1,14 @@
 package org.ggraham.udpreceiver;
 
+	/*
+	 * 
+	 * Apache License 2.0 
+	 * 
+	 * Copyright (c) [2017] [Gregory Graham]
+	 * 
+	 * See LICENSE.txt for details.
+	 * 
+	 */
 import org.ggraham.ggutils.logging.DefaultLogger;
 import org.ggraham.nsr.PackageService;
 import org.ggraham.nsr.message.IHandleMessage;
