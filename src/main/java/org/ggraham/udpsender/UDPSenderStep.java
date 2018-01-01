@@ -13,12 +13,12 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 import org.ggraham.ggutils.logging.DefaultLogger;
+import org.ggraham.ggutils.message.PacketDecoder;
+import org.ggraham.ggutils.message.PacketDecoder.FieldType;
+import org.ggraham.ggutils.message.PacketDecoder.PacketFieldConfig;
+import org.ggraham.ggutils.network.UDPSender;
 import org.ggraham.ggutils.objectpool.ObjectPool.PoolItem;
-import org.ggraham.nsr.PackageService;
-import org.ggraham.nsr.message.PacketDecoder;
-import org.ggraham.nsr.message.PacketDecoder.FieldType;
-import org.ggraham.nsr.message.PacketDecoder.PacketFieldConfig;
-import org.ggraham.nsr.network.UDPSender;
+import org.ggraham.ggutils.PackageService;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.i18n.BaseMessages;

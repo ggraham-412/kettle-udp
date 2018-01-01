@@ -10,10 +10,12 @@ package org.ggraham.udpreceiver;
 	 * 
 	 */
 import org.ggraham.ggutils.logging.DefaultLogger;
-import org.ggraham.nsr.PackageService;
-import org.ggraham.nsr.message.IHandleMessage;
-import org.ggraham.nsr.message.PacketDecoder;
-import org.ggraham.nsr.network.UDPReceiver;
+import org.ggraham.ggutils.message.IHandleMessage;
+import org.ggraham.ggutils.message.PacketDecoder;
+import org.ggraham.ggutils.message.PacketDecoder.FieldType;
+import org.ggraham.ggutils.message.PacketDecoder.PacketFieldConfig;
+import org.ggraham.ggutils.network.UDPReceiver;
+import org.ggraham.ggutils.PackageService;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.exception.KettlePluginException;
@@ -269,10 +271,23 @@ public class UDPReceiverStep extends BaseStep implements StepInterface {
 			m_data = data;
 		}
 
+		// PDI has not FLOAT or INT, so we convert them here 
+		private void reconfarbulate(Object[] outrow) {
+			PacketFieldConfig[] fields = m_meta.getFields();
+			for ( int i = 0; i < fields.length; i++ ) {
+				if ( fields[i].getFieldType() == FieldType.FLOAT ) {
+					outrow[i] = (double)(float)outrow[i];
+				} else if (fields[i].getFieldType() == FieldType.INTEGER ) {
+					outrow[i] = (long)(int)outrow[i];					
+				}
+			}
+		}
+		
 		public boolean handleMessage(ByteBuffer message) {
 			Object[] outRow = RowDataUtil.allocateRowData(m_data.m_outputRowMeta.size());
 			try {
 				m_data.m_decoder.DecodePacket(message, outRow);
+				reconfarbulate(outRow);
 			} catch (Exception ex) {
 				logBasic("Caught exception in decoder: " + ex.toString());
 				return false;

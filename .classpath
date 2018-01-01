@@ -17,7 +17,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path="/NetworkSenderReceiver"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ggutils"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

@@ -1,18 +1,8 @@
 package org.ggraham.udpsender;
 
-/*
- * 
- * Apache License 2.0 
- * 
- * Copyright (c) [2017] [Gregory Graham]
- * 
- * See LICENSE.txt for details.
- * 
- */
-
-import org.ggraham.nsr.message.PacketDecoder;
-import org.ggraham.nsr.network.UDPReceiver;
-import org.ggraham.nsr.network.UDPSender;
+import org.ggraham.ggutils.message.PacketDecoder;
+import org.ggraham.ggutils.network.UDPReceiver;
+import org.ggraham.ggutils.network.UDPSender;
 import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.core.row.ValueMetaInterface;
 import org.pentaho.di.trans.step.BaseStepData;

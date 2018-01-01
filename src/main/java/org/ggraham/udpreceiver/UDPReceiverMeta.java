@@ -9,7 +9,7 @@ package org.ggraham.udpreceiver;
  * 
  */
 
-import org.ggraham.nsr.message.PacketDecoder;
+import org.ggraham.ggutils.message.PacketDecoder;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.annotations.Step;
 import org.pentaho.di.core.database.DatabaseMeta;
