@@ -10,6 +10,7 @@ package org.ggraham.udpreceiver;
 	 * 
 	 */
 import org.ggraham.ggutils.logging.DefaultLogger;
+import org.ggraham.ggutils.logging.LogLevel;
 import org.ggraham.ggutils.message.IHandleMessage;
 import org.ggraham.ggutils.message.PacketDecoder;
 import org.ggraham.ggutils.message.PacketDecoder.FieldType;
@@ -132,6 +133,7 @@ public class UDPReceiverStep extends BaseStep implements StepInterface {
 				    bStep.logBasic(message);
 				}
 			});
+			PackageService.getLog().setLogLevel(LogLevel.BASIC);
 
 			try {
 				configureConnection((UDPReceiverMeta) smi, (UDPReceiverData) sdi);

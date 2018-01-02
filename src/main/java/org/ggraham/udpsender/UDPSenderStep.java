@@ -13,6 +13,7 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 import org.ggraham.ggutils.logging.DefaultLogger;
+import org.ggraham.ggutils.logging.LogLevel;
 import org.ggraham.ggutils.message.PacketDecoder;
 import org.ggraham.ggutils.message.PacketDecoder.FieldType;
 import org.ggraham.ggutils.message.PacketDecoder.PacketFieldConfig;
@@ -76,9 +77,10 @@ public class UDPSenderStep extends BaseStep implements StepInterface {
 				PackageService.getPackageService().setLogImpl(new DefaultLogger() {
 					@Override
 					protected void doLog(String source, String message, int setLevel, int logLevel, String sLogLevel) {
-					    bStep.logBasic(message);
+					    bStep.logBasic(source + " " + message);
 					}
 				});
+				PackageService.getLog().setLogLevel(LogLevel.BASIC);
 				configureConnection(uMeta, uData);
 			}
 
@@ -97,9 +99,14 @@ public class UDPSenderStep extends BaseStep implements StepInterface {
 			}
 
 			PoolItem<ByteBuffer> pBuffer = uData.m_sender.getByteBuffer();
-			uData.m_decoder.EncodePacket(toSend, pBuffer.getPoolItem());
-			uData.m_sender.send(pBuffer);
-			logBasic("Sent Message");
+			if ( uData.m_decoder.EncodePacket(toSend, pBuffer.getPoolItem()) ) {
+    			uData.m_sender.send(pBuffer);
+    			logDebug("Sent packet");
+			}
+			else {
+				pBuffer.putBack();  // normally the sender does this
+    			logError("Packet not sent because of encoding errors.");				
+			}
 
 			return true;
 		}
