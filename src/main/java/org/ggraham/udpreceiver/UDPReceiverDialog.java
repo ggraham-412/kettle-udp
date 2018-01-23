@@ -79,6 +79,7 @@ public class UDPReceiverDialog extends BaseStepDialog implements StepDialogInter
  private TextVar m_wPoolMaxSize;
  
  private Button m_wBigEndian;
+ private Button m_wPassBinary;
 
  
  public UDPReceiverDialog( Shell parent, BaseStepMeta baseStepMeta,
@@ -407,6 +408,26 @@ public class UDPReceiverDialog extends BaseStepDialog implements StepDialogInter
    fd.right = new FormAttachment( 100, 0 );
    m_wBigEndian.setLayoutData( fd );
    lastControl = m_wBigEndian;
+
+   Label wlPassBinary = new Label( wAdvancedTabComp, SWT.RIGHT );
+   wlPassBinary.setText( BaseMessages
+       .getString( UDPReceiverMeta.PKG,
+    		   "UDPReceiverDialog.PassBinary.Label" ) );
+   props.setLook( wlPassBinary );
+   fd = new FormData();
+   fd.left = new FormAttachment( 0, 0 );
+   fd.top = new FormAttachment( lastControl, margin * 2 );
+   fd.right = new FormAttachment( middle, -margin );
+   wlPassBinary.setLayoutData( fd );
+
+   m_wPassBinary = new Button( wAdvancedTabComp, SWT.CHECK );
+   props.setLook( m_wPassBinary );
+   fd = new FormData();
+   fd.left = new FormAttachment( middle, 0 );
+   fd.top = new FormAttachment( lastControl, margin * 2 );
+   fd.right = new FormAttachment( 100, 0 );
+   m_wPassBinary.setLayoutData( fd );
+   lastControl = m_wPassBinary;
 
    FormData fdAdvancedTabComp = new FormData();
    fdAdvancedTabComp.left = new FormAttachment( 0, 0 );

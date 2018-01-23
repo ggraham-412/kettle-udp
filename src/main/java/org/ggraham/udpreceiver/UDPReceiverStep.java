@@ -286,12 +286,21 @@ public class UDPReceiverStep extends BaseStep implements StepInterface {
 		
 		public boolean handleMessage(ByteBuffer message) {
 			Object[] outRow = RowDataUtil.allocateRowData(m_data.m_outputRowMeta.size());
-			try {
-				m_data.m_decoder.DecodePacket(message, outRow);
-				reconfarbulate(outRow);
-			} catch (Exception ex) {
-				logBasic("Caught exception in decoder: " + ex.toString());
-				return false;
+			
+			if ( m_meta.getPassAsBinary() ) {
+				// Get bytes directly into first output field
+				// It had better be BINARY!!!
+				outRow[0] = message.remaining();
+			}
+			else {
+			    // Use the decoder
+    			try {
+				    m_data.m_decoder.DecodePacket(message, outRow);
+				    reconfarbulate(outRow);
+			    } catch (Exception ex) {
+		    		logBasic("Caught exception in decoder: " + ex.toString());
+	    			return false;
+    			}
 			}
 			try {
 				putRow(m_data.m_outputRowMeta, outRow); // putRow is synched according to javadoc

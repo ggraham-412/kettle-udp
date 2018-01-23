@@ -63,6 +63,7 @@ public class UDPReceiverMeta
   private String m_bufferSize = "512";
   private String m_initPoolSize = "100";
   private String m_maxPoolSize = "200";
+  private String m_passAsBinary = (new Boolean(false).toString());
   private String m_bigEndian = (new Boolean(true)).toString();
   private List<String> m_fieldNames = new ArrayList<String>();
   private List<PacketDecoder.PacketFieldConfig> m_fields = new ArrayList<PacketDecoder.PacketFieldConfig>();
@@ -131,6 +132,13 @@ public class UDPReceiverMeta
 	  m_bigEndian = (new Boolean(endian)).toString();
   }
   
+  public boolean getPassAsBinary() {
+	  return Boolean.parseBoolean(m_passAsBinary);
+  }
+  public void setPassAsBinary(boolean passAsBinary) {
+	  m_passAsBinary = (new Boolean(passAsBinary)).toString();
+  }
+  
   public String getMaxPackets() {
 	  return m_executeMaxPackets;
   }
@@ -145,8 +153,6 @@ public class UDPReceiverMeta
 	  m_executeForDuration = maxDuration;
   }
 
-  
-  
   @Override public void setDefault() {
       m_executeForDuration = "0";
       m_executeMaxPackets = "0";
@@ -156,6 +162,7 @@ public class UDPReceiverMeta
       m_initPoolSize = "100";
       m_maxPoolSize = "512";
       m_bigEndian = (new Boolean(true)).toString();
+      m_passAsBinary = (new Boolean(false)).toString();
       m_fieldNames.clear();
       m_fields.clear();
   }
@@ -169,7 +176,12 @@ public class UDPReceiverMeta
   @Override public StepDataInterface getStepData() {
     return new UDPReceiverData();
   }
-
+  
+  private String getTagValue(Node stepNode, String tagName, String defvalue) {
+	  String tmp = XMLHandler.getTagValue(stepNode,  tagName);
+	  return (tmp==null?defvalue:tmp);
+  }
+  
   @Override public void loadXML( Node stepnode, List<DatabaseMeta> databases, IMetaStore metaStore )
       throws KettleXMLException {
 	  m_address = XMLHandler.getTagValue( stepnode, "ADDRESS" );
@@ -180,6 +192,7 @@ public class UDPReceiverMeta
 	  m_initPoolSize = XMLHandler.getTagValue( stepnode, "INITPOOLSIZE");	
 	  m_maxPoolSize = XMLHandler.getTagValue( stepnode, "MAXPOOLSIZE");	
 	  m_bigEndian = XMLHandler.getTagValue(stepnode,  "BIG_ENDIAN");
+	  m_passAsBinary = getTagValue(stepnode, "PASS_AS_BINARY", new Boolean(false).toString());
 	  String strFieldNames = XMLHandler.getTagValue( stepnode, "FIELD_NAMES");
 	  if ( strFieldNames != null && !strFieldNames.isEmpty() ) {
 	  String[] fieldNames = strFieldNames.split(",");
@@ -217,6 +230,9 @@ public class UDPReceiverMeta
     if ( !Const.isEmpty( m_bigEndian ) ) {
         retval.append( "    " ).append( XMLHandler.addTagValue( "BIG_ENDIAN", m_bigEndian ) );
       }
+    if ( !Const.isEmpty( m_passAsBinary ) ) {
+        retval.append( "    " ).append( XMLHandler.addTagValue( "PASS_AS_BINARY", m_passAsBinary ) );
+      }
     if ( m_fieldNames.size() > 0 ) {
     	String strFieldNames = String.join(",", m_fieldNames);
         retval.append( "    " ).append( XMLHandler.addTagValue( "FIELD_NAMES", strFieldNames ) );
@@ -230,6 +246,11 @@ public class UDPReceiverMeta
     return retval.toString();
   }
 
+  private String readRepValue(Repository rep, ObjectId stepId, String key, String defvalue) throws KettleException {
+	  String tmp = rep.getStepAttributeString(stepId, key);
+	  return tmp == null ? defvalue : tmp;
+  }
+  
   @Override public void readRep( Repository rep, IMetaStore metaStore, ObjectId stepId, List<DatabaseMeta> databases )
       throws KettleException {
 	    m_address = rep.getStepAttributeString( stepId, "ADDRESS" );
@@ -240,6 +261,7 @@ public class UDPReceiverMeta
 	    m_initPoolSize = rep.getStepAttributeString( stepId, "INITPOOLSIZE" );    
 	    m_maxPoolSize = rep.getStepAttributeString( stepId, "MAXPOOLSIZE" );    
 	    m_bigEndian = rep.getStepAttributeString( stepId, "BIG_ENDIAN" );    
+	    m_passAsBinary = readRepValue(rep, stepId, "PASS_AS_BINARY", new Boolean(false).toString());
 		  String strFieldNames = rep.getStepAttributeString( stepId, "FIELD_NAMES");
 		  if ( strFieldNames != null && !strFieldNames.isEmpty() ) {
 		  String[] fieldNames = strFieldNames.split(",");
@@ -275,6 +297,9 @@ public class UDPReceiverMeta
 	      }
 	    if ( !Const.isEmpty( m_bigEndian ) ) {
 	        rep.saveStepAttribute( transformationId, stepId, "BIG_ENDIAN", m_bigEndian );
+	      }
+	    if ( !Const.isEmpty( m_passAsBinary ) ) {
+	        rep.saveStepAttribute( transformationId, stepId, "PASS_AS_BINARY", m_passAsBinary );
 	      }
 	    if ( m_fieldNames.size() > 0 ) {
 	    	String strFieldNames = String.join(",", m_fieldNames);
