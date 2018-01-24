@@ -9,7 +9,9 @@ package org.ggraham.udpreceiver;
  * 
  */
 
+import org.ggraham.ggutils.message.FieldType;
 import org.ggraham.ggutils.message.PacketDecoder;
+import org.ggraham.ggutils.message.PacketFieldConfig;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.annotations.Step;
 import org.pentaho.di.core.database.DatabaseMeta;
@@ -66,7 +68,7 @@ public class UDPReceiverMeta
   private String m_passAsBinary = (new Boolean(false).toString());
   private String m_bigEndian = (new Boolean(true)).toString();
   private List<String> m_fieldNames = new ArrayList<String>();
-  private List<PacketDecoder.PacketFieldConfig> m_fields = new ArrayList<PacketDecoder.PacketFieldConfig>();
+  private List<PacketFieldConfig> m_fields = new ArrayList<PacketFieldConfig>();
 
   public String[] getFieldNames() {
 	  return m_fieldNames.toArray(new String[] {});
@@ -77,19 +79,19 @@ public class UDPReceiverMeta
 		  m_fieldNames.add(s);
 	  }
   }
-  public PacketDecoder.PacketFieldConfig[] getFields() {
-	  return  m_fields.toArray(new PacketDecoder.PacketFieldConfig[] {}); 
+  public PacketFieldConfig[] getFields() {
+	  return  m_fields.toArray(new PacketFieldConfig[] {}); 
   }
-  public void setFields(PacketDecoder.PacketFieldConfig[] fields) {
+  public void setFields(PacketFieldConfig[] fields) {
 	  m_fields.clear();
-	  for (PacketDecoder.PacketFieldConfig f : fields) {
+	  for (PacketFieldConfig f : fields) {
 		  m_fields.add(f);
 	  }
   }
   public void setFields(String[] fields) {
 	  m_fields.clear();
 	  for (String f : fields) {
-		  m_fields.add(PacketDecoder.PacketFieldConfig.fromString(f));
+		  m_fields.add(PacketFieldConfig.fromString(f));
 	  }
   }
   
@@ -313,7 +315,7 @@ public class UDPReceiverMeta
 	    }
   }
 
-  private static int convertTypeIds(PacketDecoder.FieldType ft) {
+  private static int convertTypeIds(FieldType ft) {
 	  switch(ft) {
 	  case DOUBLE : 
 	  case FLOAT : 
@@ -323,7 +325,7 @@ public class UDPReceiverMeta
 		  return ValueMetaInterface.TYPE_INTEGER;
 	  case STRING : 
 		  return ValueMetaInterface.TYPE_STRING;
-	  case RAWBYTES : 
+	  case BINARY : 
 		  return ValueMetaInterface.TYPE_BINARY;
 	  default:
 		  return ValueMetaInterface.TYPE_NONE;

@@ -15,8 +15,8 @@ import java.util.HashMap;
 import org.ggraham.ggutils.logging.DefaultLogger;
 import org.ggraham.ggutils.logging.LogLevel;
 import org.ggraham.ggutils.message.PacketDecoder;
-import org.ggraham.ggutils.message.PacketDecoder.FieldType;
-import org.ggraham.ggutils.message.PacketDecoder.PacketFieldConfig;
+import org.ggraham.ggutils.message.FieldType;
+import org.ggraham.ggutils.message.PacketFieldConfig;
 import org.ggraham.ggutils.network.UDPSender;
 import org.ggraham.ggutils.objectpool.ObjectPool.PoolItem;
 import org.ggraham.ggutils.PackageService;
@@ -135,7 +135,7 @@ public class UDPSenderStep extends BaseStep implements StepInterface {
 			logBasic("IP Address is " + address + ":" + sPort);
 
 			data.m_decoder = new PacketDecoder();
-			for (PacketDecoder.PacketFieldConfig f : meta.getFields()) {
+			for (PacketFieldConfig f : meta.getFields()) {
 				data.m_decoder.addField(f);
 			}
 

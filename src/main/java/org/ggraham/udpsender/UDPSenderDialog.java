@@ -35,6 +35,8 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.ggraham.ggutils.message.PacketDecoder;
+import org.ggraham.ggutils.message.PacketFieldConfig;
+import org.ggraham.ggutils.message.FieldType;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.Props;
 import org.pentaho.di.core.row.ValueMetaInterface;
@@ -230,7 +232,7 @@ public class UDPSenderDialog extends BaseStepDialog implements StepDialogInterfa
    props.setLook( wFieldsTabComp );
    wFieldsTabComp.setLayout( mainLayout2 );
    
-   PacketDecoder.FieldType[] fTypes = PacketDecoder.FieldType.values();
+   FieldType[] fTypes = FieldType.values();
    String[] fTypeNames = new String[fTypes.length];
    for ( int ii = 0; ii<fTypeNames.length; ii++) fTypeNames[ii] = fTypes[ii].toString();
    
@@ -447,21 +449,21 @@ public class UDPSenderDialog extends BaseStepDialog implements StepDialogInterfa
 	    // fields
 	    int nrNonEmptyFields = m_wFieldsTable.nrNonEmpty();
 	    List<String> fieldNames = new ArrayList<String>();
-	    List<PacketDecoder.PacketFieldConfig> fields = new ArrayList<PacketDecoder.PacketFieldConfig>();
+	    List<PacketFieldConfig> fields = new ArrayList<PacketFieldConfig>();
 	    for ( int i = 0; i < nrNonEmptyFields; i++ ) {
 	      TableItem item = m_wFieldsTable.getNonEmpty( i );
 	      fieldNames.add( item.getText( 1 ).trim() );
 	      String tp = item.getText( 2 ).trim();
 	      String enc = item.getText( 3 ).trim();
 	      if ( enc.isEmpty() ) {
-		      fields.add(new PacketDecoder.PacketFieldConfig(tp)); 	  
+		      fields.add(new PacketFieldConfig(tp)); 	  
 	      }
 	      else {
-		      fields.add(new PacketDecoder.PacketFieldConfig(tp, enc));
+		      fields.add(new PacketFieldConfig(tp, enc));
 	      }
 	    }
 	    subscriberMeta.setFieldNames(fieldNames.toArray(new String[] {}));
-	    subscriberMeta.setFields(fields.toArray(new PacketDecoder.PacketFieldConfig[] {}));
+	    subscriberMeta.setFields(fields.toArray(new PacketFieldConfig[] {}));
 	    
 	   subscriberMeta.setChanged();
  }
@@ -477,7 +479,7 @@ public class UDPSenderDialog extends BaseStepDialog implements StepDialogInterfa
    m_wBigEndian.setSelection(subscriberMeta.getBigEndian());
 
    String[] fieldNames = subscriberMeta.getFieldNames();
-   PacketDecoder.PacketFieldConfig[] fields = subscriberMeta.getFields();
+   PacketFieldConfig[] fields = subscriberMeta.getFields();
    if ( fields.length > 0 ) {
      m_wFieldsTable.clearAll( false );
      Table table = m_wFieldsTable.getTable();

@@ -13,8 +13,8 @@ import org.ggraham.ggutils.logging.DefaultLogger;
 import org.ggraham.ggutils.logging.LogLevel;
 import org.ggraham.ggutils.message.IHandleMessage;
 import org.ggraham.ggutils.message.PacketDecoder;
-import org.ggraham.ggutils.message.PacketDecoder.FieldType;
-import org.ggraham.ggutils.message.PacketDecoder.PacketFieldConfig;
+import org.ggraham.ggutils.message.FieldType;
+import org.ggraham.ggutils.message.PacketFieldConfig;
 import org.ggraham.ggutils.network.UDPReceiver;
 import org.ggraham.ggutils.PackageService;
 import org.pentaho.di.core.Const;
@@ -206,7 +206,7 @@ public class UDPReceiverStep extends BaseStep implements StepInterface {
 			logBasic("IP Address is " + address + ":" + sPort);
 
 			data.m_decoder = new PacketDecoder();
-			for (PacketDecoder.PacketFieldConfig f : meta.getFields()) {
+			for (PacketFieldConfig f : meta.getFields()) {
 				data.m_decoder.addField(f);
 				logBasic("  Adding field: " + f.toString());
 			}
