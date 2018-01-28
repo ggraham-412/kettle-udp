@@ -240,6 +240,7 @@ public class UDPSenderDialog extends BaseStepDialog implements StepDialogInterfa
 		      new ColumnInfo[] {
 				        new ColumnInfo( "Name", ColumnInfo.COLUMN_TYPE_TEXT ),
 				        new ColumnInfo( "Type", ColumnInfo.COLUMN_TYPE_CCOMBO, fTypeNames, true ),
+				        new ColumnInfo( "Field Length", ColumnInfo.COLUMN_TYPE_TEXT ),
 				        new ColumnInfo( "Encoding", ColumnInfo.COLUMN_TYPE_TEXT )
 		      };
 
@@ -453,17 +454,57 @@ public class UDPSenderDialog extends BaseStepDialog implements StepDialogInterfa
 	    for ( int i = 0; i < nrNonEmptyFields; i++ ) {
 	      TableItem item = m_wFieldsTable.getNonEmpty( i );
 	      fieldNames.add( item.getText( 1 ).trim() );
-	      String tp = item.getText( 2 ).trim();
-	      String enc = item.getText( 3 ).trim();
-	      if ( enc.isEmpty() ) {
-		      fields.add(new PacketFieldConfig(tp)); 	  
+	      String fieldType = item.getText(2).trim();
+	      if ( PacketFieldConfig.isSimpleType(fieldType)) {
+	    	  fields.add(PacketFieldConfig.fromString(fieldType));
+	    	  continue;
+	      }
+          StringBuilder bld = new StringBuilder(fieldType);	
+          bld.append("(");          
+	      String flen = item.getText(3).trim();
+	      if ( flen == null || flen.isEmpty() || flen.equals("V") ) {
+	    	  bld.append("V");
+	      } else if ( flen.equals("R") ) {
+	    	  bld.append("R");	    	  
+	      } else {
+	    	  int iflen = 0;
+	    	  try {
+	    		  iflen = Integer.parseInt(flen);	    		  
+	    	  }
+	    	  catch (Exception e) {
+	    		  iflen = 0;
+	    	  }
+	    	  if ( iflen < 0 ) {
+		    	  bld.append("R");	    	  	    		  
+	    	  } else if ( iflen == 0 ) {
+		    	  bld.append("V");	    		  
+	    	  } else {
+	    		  bld.append(flen);
+	    	  }	    	  
+	      }
+	      if ( fieldType.equals("BINARY")) {
+	    	  bld.append(")");
+	    	  fields.add(PacketFieldConfig.fromString(bld.toString()));
+	    	  continue;
+	      }
+	      
+	      String enc = item.getText( 4 ).trim();
+	      if ( enc == null || enc.isEmpty() ) {
+	    	  bld.append(")");
+	    	  fields.add(PacketFieldConfig.fromString(bld.toString()));
 	      }
 	      else {
-		      fields.add(new PacketFieldConfig(tp, enc));
+	    	  bld.append(";").append(enc);
+	    	  bld.append(")");
+	    	  fields.add(PacketFieldConfig.fromString(bld.toString()));
 	      }
 	    }
 	    subscriberMeta.setFieldNames(fieldNames.toArray(new String[] {}));
 	    subscriberMeta.setFields(fields.toArray(new PacketFieldConfig[] {}));
+	    
+        for ( int i = 0; i < fieldNames.size(); i++ ) {
+        	logBasic("Field " + fieldNames.get(i) + " set to " + fields.get(i).toString() );
+        }
 	    
 	   subscriberMeta.setChanged();
  }
@@ -487,9 +528,17 @@ public class UDPSenderDialog extends BaseStepDialog implements StepDialogInterfa
        TableItem item = new TableItem( table, SWT.NONE );
        item.setText( 1, fieldNames[i].trim() );
        item.setText( 2, fields[i].getFieldType().toString() );
+       int flen = fields[i].getFixedLength();
+       if ( flen < 0 ) {
+    	   item.setText(3, "R");
+       } else if (flen == 0 ) {
+    	   item.setText(3, "V");
+       } else {
+    	   item.setText(3, (new Integer(flen)).toString()); 	   
+       }
        String encoding = fields[i].getEncoding();
-       if ( encoding == null ) encoding = "";
-       item.setText( 3, encoding.trim() );
+       if ( encoding == PacketFieldConfig.DEFAULT_ENCODING ) encoding = "";
+       item.setText( 4, encoding.trim() );
      }
 
      m_wFieldsTable.removeEmptyRows();
