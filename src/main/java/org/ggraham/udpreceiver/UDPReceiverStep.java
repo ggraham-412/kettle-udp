@@ -211,7 +211,13 @@ public class UDPReceiverStep extends BaseStep implements StepInterface {
 				logBasic("  Adding field: " + f.toString());
 			}
 			logBasic("Big endian: " + meta.getBigEndian());
-			data.m_receiver = new UDPReceiver(address, port, meta.getBigEndian(), new HandlerCallback(meta, data));
+			HandlerCallback callback = new HandlerCallback_Default(meta, data);
+			if ( meta.getPassAsBinary() ) {
+				callback = new HandlerCallback_PassBinary(meta, data);
+			} else if (meta.getRepeatingGroups()) {
+				callback = new HandlerCallback_Repeating(meta, data);				
+			}
+			data.m_receiver = new UDPReceiver(address, port, meta.getBigEndian(), callback);
 			logBasic("Created receiver " + (data.m_receiver != null));
 
 			String sBufferSize = environmentSubstitute(meta.getBufferSize());
@@ -262,18 +268,18 @@ public class UDPReceiverStep extends BaseStep implements StepInterface {
 		}
 	}
 
-	protected class HandlerCallback implements IHandleMessage<ByteBuffer> {
+	protected abstract class HandlerCallback implements IHandleMessage<ByteBuffer> {
 
-		private UDPReceiverMeta m_meta;
-		private UDPReceiverData m_data;
+		protected UDPReceiverMeta m_meta;
+		protected UDPReceiverData m_data;
 
-		public HandlerCallback(UDPReceiverMeta meta, UDPReceiverData data) {
+		protected HandlerCallback(UDPReceiverMeta meta, UDPReceiverData data) {
 			m_meta = meta;
 			m_data = data;
 		}
 
 		// PDI has not FLOAT or INT, so we convert them here 
-		private void reconfarbulate(Object[] outrow) {
+		protected void reconfarbulate(Object[] outrow) {
 			PacketFieldConfig[] fields = m_meta.getFields();
 			for ( int i = 0; i < fields.length; i++ ) {
 				if ( fields[i].getFieldType() == FieldType.FLOAT ) {
@@ -284,24 +290,81 @@ public class UDPReceiverStep extends BaseStep implements StepInterface {
 			}
 		}
 		
+		public abstract boolean handleMessage(ByteBuffer message);
+	}
+
+	protected class HandlerCallback_Default extends HandlerCallback {
+
+		public HandlerCallback_Default(UDPReceiverMeta meta, UDPReceiverData data) {
+			super(meta,data);
+		}
+		
 		public boolean handleMessage(ByteBuffer message) {
 			Object[] outRow = RowDataUtil.allocateRowData(m_data.m_outputRowMeta.size());
 			
-			if ( m_meta.getPassAsBinary() ) {
-				// Get bytes directly into first output field
-				// It had better be BINARY!!!
-				outRow[0] = message.remaining();
+			try {
+				m_data.m_decoder.DecodePacket(message, outRow);
+			    reconfarbulate(outRow);
+		    } catch (Exception ex) {
+	    		logBasic("Caught exception in decoder: " + ex.toString());
+    			return false;
+   			}
+
+			try {
+				putRow(m_data.m_outputRowMeta, outRow); // putRow is synched according to javadoc
+				synchronized (m_data.m_lock) {
+					m_data.m_currentPacketCount++;
+				}
+			} catch (KettleStepException e) {
+				return false;
 			}
-			else {
-			    // Use the decoder
+			return true;
+		}
+
+	}
+
+	protected class HandlerCallback_Repeating extends HandlerCallback {
+
+		public HandlerCallback_Repeating(UDPReceiverMeta meta, UDPReceiverData data) {
+			super(meta,data);
+		}
+		
+		public boolean handleMessage(ByteBuffer message) {
+			
+			while (message.remaining() > 0 ) {
+				Object[] outRow = RowDataUtil.allocateRowData(m_data.m_outputRowMeta.size());
     			try {
-				    m_data.m_decoder.DecodePacket(message, outRow);
-				    reconfarbulate(outRow);
-			    } catch (Exception ex) {
-		    		logBasic("Caught exception in decoder: " + ex.toString());
-	    			return false;
-    			}
+	    			m_data.m_decoder.DecodePacket(message, outRow);
+		    	    reconfarbulate(outRow);
+		        } catch (Exception ex) {
+	    		    logBasic("Caught exception in decoder: " + ex.toString());
+    			    return false;
+   			    }
+
+    			try {
+	    			putRow(m_data.m_outputRowMeta, outRow); // putRow is synched according to javadoc
+		    		synchronized (m_data.m_lock) {
+			    		m_data.m_currentPacketCount++;
+				    }
+			    } catch (KettleStepException e) {
+				    return false;
+			    }
 			}
+			return true;
+		}
+
+	}
+
+	protected class HandlerCallback_PassBinary extends HandlerCallback {
+
+		public HandlerCallback_PassBinary(UDPReceiverMeta meta, UDPReceiverData data) {
+			super(meta,data);
+		}
+
+		public boolean handleMessage(ByteBuffer message) {
+			Object[] outRow = RowDataUtil.allocateRowData(m_data.m_outputRowMeta.size());
+			byte[] val = new byte[message.remaining()];
+			outRow[0] = message.get(val, 0, val.length);
 			try {
 				putRow(m_data.m_outputRowMeta, outRow); // putRow is synched according to javadoc
 				synchronized (m_data.m_lock) {

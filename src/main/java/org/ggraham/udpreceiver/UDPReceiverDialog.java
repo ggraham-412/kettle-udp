@@ -82,7 +82,7 @@ public class UDPReceiverDialog extends BaseStepDialog implements StepDialogInter
  
  private Button m_wBigEndian;
  private Button m_wPassBinary;
-
+ private Button m_wRepeatingGroups;
  
  public UDPReceiverDialog( Shell parent, BaseStepMeta baseStepMeta,
                               TransMeta transMeta, String stepname ) {
@@ -437,6 +437,26 @@ public class UDPReceiverDialog extends BaseStepDialog implements StepDialogInter
    m_wPassBinary.setLayoutData( fd );
    lastControl = m_wPassBinary;
 
+   Label wlRepeatingGroups = new Label( wAdvancedTabComp, SWT.RIGHT );
+   wlRepeatingGroups.setText( BaseMessages
+       .getString( UDPReceiverMeta.PKG,
+    		   "UDPReceiverDialog.RepeatingGroups.Label" ) );
+   props.setLook( wlRepeatingGroups );
+   fd = new FormData();
+   fd.left = new FormAttachment( 0, 0 );
+   fd.top = new FormAttachment( lastControl, margin * 2 );
+   fd.right = new FormAttachment( middle, -margin );
+   wlRepeatingGroups.setLayoutData( fd );
+
+   m_wRepeatingGroups = new Button( wAdvancedTabComp, SWT.CHECK );
+   props.setLook( m_wRepeatingGroups );
+   fd = new FormData();
+   fd.left = new FormAttachment( middle, 0 );
+   fd.top = new FormAttachment( lastControl, margin * 2 );
+   fd.right = new FormAttachment( 100, 0 );
+   m_wRepeatingGroups.setLayoutData( fd );
+   lastControl = m_wRepeatingGroups;
+
    FormData fdAdvancedTabComp = new FormData();
    fdAdvancedTabComp.left = new FormAttachment( 0, 0 );
    fdAdvancedTabComp.top = new FormAttachment( 0, 0 );
@@ -536,6 +556,8 @@ public class UDPReceiverDialog extends BaseStepDialog implements StepDialogInter
 	   subscriberMeta.setInitPoolSize( m_wPoolInitSize.getText() );
 	   subscriberMeta.setMaxPoolSize(m_wPoolMaxSize.getText() );
 	   subscriberMeta.setBigEndian(m_wBigEndian.getSelection());
+	   subscriberMeta.setPassAsBinary(m_wPassBinary.getSelection());
+	   subscriberMeta.setRepeatingGroups(m_wRepeatingGroups.getSelection());
 	   
 	    // fields
 	    int nrNonEmptyFields = m_wFieldsTable.nrNonEmpty();
@@ -611,6 +633,8 @@ public class UDPReceiverDialog extends BaseStepDialog implements StepDialogInter
    m_wPoolInitSize.setText( Const.NVL( subscriberMeta.getInitPoolSize(), "0" ) );
    m_wPoolMaxSize.setText( Const.NVL( subscriberMeta.getMaxPoolSize(), "0" ) );
    m_wBigEndian.setSelection(subscriberMeta.getBigEndian());
+   m_wRepeatingGroups.setSelection(subscriberMeta.getRepeatingGroups());
+   m_wPassBinary.setSelection(subscriberMeta.getPassAsBinary());
 
    String[] fieldNames = subscriberMeta.getFieldNames();
    PacketFieldConfig[] fields = subscriberMeta.getFields();

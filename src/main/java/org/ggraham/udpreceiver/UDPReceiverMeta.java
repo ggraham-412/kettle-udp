@@ -66,6 +66,7 @@ public class UDPReceiverMeta
   private String m_initPoolSize = "100";
   private String m_maxPoolSize = "200";
   private String m_passAsBinary = (new Boolean(false).toString());
+  private String m_repeatingGroups = (new Boolean(false).toString());
   private String m_bigEndian = (new Boolean(true)).toString();
   private List<String> m_fieldNames = new ArrayList<String>();
   private List<PacketFieldConfig> m_fields = new ArrayList<PacketFieldConfig>();
@@ -141,6 +142,13 @@ public class UDPReceiverMeta
 	  m_passAsBinary = (new Boolean(passAsBinary)).toString();
   }
   
+  public boolean getRepeatingGroups() {
+	  return Boolean.parseBoolean(m_repeatingGroups);
+  }
+  public void setRepeatingGroups(boolean repeatingGroups) {
+	  m_repeatingGroups = (new Boolean(repeatingGroups)).toString();
+  }
+  
   public String getMaxPackets() {
 	  return m_executeMaxPackets;
   }
@@ -165,6 +173,7 @@ public class UDPReceiverMeta
       m_maxPoolSize = "512";
       m_bigEndian = (new Boolean(true)).toString();
       m_passAsBinary = (new Boolean(false)).toString();
+      m_repeatingGroups = (new Boolean(false)).toString();
       m_fieldNames.clear();
       m_fields.clear();
   }
@@ -195,6 +204,7 @@ public class UDPReceiverMeta
 	  m_maxPoolSize = XMLHandler.getTagValue( stepnode, "MAXPOOLSIZE");	
 	  m_bigEndian = XMLHandler.getTagValue(stepnode,  "BIG_ENDIAN");
 	  m_passAsBinary = getTagValue(stepnode, "PASS_AS_BINARY", new Boolean(false).toString());
+	  m_repeatingGroups = getTagValue(stepnode, "REPEATING_GROUPS", new Boolean(false).toString());
 	  String strFieldNames = XMLHandler.getTagValue( stepnode, "FIELD_NAMES");
 	  if ( strFieldNames != null && !strFieldNames.isEmpty() ) {
 	  String[] fieldNames = strFieldNames.split(",");
@@ -235,6 +245,9 @@ public class UDPReceiverMeta
     if ( !Const.isEmpty( m_passAsBinary ) ) {
         retval.append( "    " ).append( XMLHandler.addTagValue( "PASS_AS_BINARY", m_passAsBinary ) );
       }
+    if ( !Const.isEmpty( m_repeatingGroups ) ) {
+        retval.append( "    " ).append( XMLHandler.addTagValue( "REPEATING_GROUPS", m_repeatingGroups ) );
+      }
     if ( m_fieldNames.size() > 0 ) {
     	String strFieldNames = String.join(",", m_fieldNames);
         retval.append( "    " ).append( XMLHandler.addTagValue( "FIELD_NAMES", strFieldNames ) );
@@ -264,6 +277,7 @@ public class UDPReceiverMeta
 	    m_maxPoolSize = rep.getStepAttributeString( stepId, "MAXPOOLSIZE" );    
 	    m_bigEndian = rep.getStepAttributeString( stepId, "BIG_ENDIAN" );    
 	    m_passAsBinary = readRepValue(rep, stepId, "PASS_AS_BINARY", new Boolean(false).toString());
+	    m_repeatingGroups = readRepValue(rep, stepId, "REPEATING_GROUPS", new Boolean(false).toString());
 		  String strFieldNames = rep.getStepAttributeString( stepId, "FIELD_NAMES");
 		  if ( strFieldNames != null && !strFieldNames.isEmpty() ) {
 		  String[] fieldNames = strFieldNames.split(",");
@@ -303,6 +317,9 @@ public class UDPReceiverMeta
 	    if ( !Const.isEmpty( m_passAsBinary ) ) {
 	        rep.saveStepAttribute( transformationId, stepId, "PASS_AS_BINARY", m_passAsBinary );
 	      }
+	    if ( !Const.isEmpty( m_repeatingGroups ) ) {
+	        rep.saveStepAttribute( transformationId, stepId, "REPEATING_GROUPS", m_repeatingGroups );
+	      }
 	    if ( m_fieldNames.size() > 0 ) {
 	    	String strFieldNames = String.join(",", m_fieldNames);
 	    	rep.saveStepAttribute( transformationId, stepId, "FIELD_NAMES", strFieldNames );
@@ -327,6 +344,8 @@ public class UDPReceiverMeta
 		  return ValueMetaInterface.TYPE_STRING;
 	  case BINARY : 
 		  return ValueMetaInterface.TYPE_BINARY;
+	  case DATE: 
+		  return ValueMetaInterface.TYPE_DATE;
 	  default:
 		  return ValueMetaInterface.TYPE_NONE;
 	  }

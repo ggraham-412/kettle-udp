@@ -243,6 +243,8 @@ public class UDPSenderMeta
 		  return ValueMetaInterface.TYPE_STRING;
 	  case BINARY : 
 		  return ValueMetaInterface.TYPE_BINARY;
+	  case DATE : 
+		  return ValueMetaInterface.TYPE_DATE;
 	  default:
 		  return ValueMetaInterface.TYPE_NONE;
 	  }
