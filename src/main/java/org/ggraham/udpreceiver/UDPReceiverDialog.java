@@ -79,6 +79,8 @@ public class UDPReceiverDialog extends BaseStepDialog implements StepDialogInter
  private TextVar m_wBufferSize;
  private TextVar m_wPoolInitSize;
  private TextVar m_wPoolMaxSize;
+ private TextVar m_wThreadCount;
+ private TextVar m_wPacketBufferSize;
  
  private Button m_wBigEndian;
  private Button m_wPassBinary;
@@ -397,6 +399,46 @@ public class UDPReceiverDialog extends BaseStepDialog implements StepDialogInter
    m_wPoolMaxSize.setLayoutData( fdMaxPool );
    lastControl = m_wPoolMaxSize;
 
+   // Thread Count
+   Label wlThreadCount = new Label( wAdvancedTabComp, SWT.RIGHT );
+   wlThreadCount.setText( BaseMessages.getString( UDPReceiverMeta.PKG, "UDPReceiverDialog.ThreadCount.Label" ) );
+   props.setLook( wlThreadCount );
+   FormData fdlThreadCount = new FormData();
+   fdlThreadCount.top = new FormAttachment( lastControl, margin  );
+   fdlThreadCount.left = new FormAttachment( 0, 0 );
+   fdlThreadCount.right = new FormAttachment( middle, -margin );
+   wlThreadCount.setLayoutData( fdlThreadCount );
+   m_wThreadCount = new TextVar( transMeta, wAdvancedTabComp, SWT.SINGLE | SWT.LEFT
+     | SWT.BORDER );
+   props.setLook( m_wThreadCount );
+   m_wThreadCount.addModifyListener( lsMod );
+   FormData fdThreadPool = new FormData();
+   fdThreadPool.top = new FormAttachment( lastControl, margin );
+   fdThreadPool.left = new FormAttachment( middle, 0 );
+   fdMaxPool.right = new FormAttachment( 100, 0 );
+   m_wThreadCount.setLayoutData( fdThreadPool );
+   lastControl = m_wThreadCount;
+
+   // Packet Buffer
+   Label wlPacketBufferSize = new Label( wAdvancedTabComp, SWT.RIGHT );
+   wlPacketBufferSize.setText( BaseMessages.getString( UDPReceiverMeta.PKG, "UDPReceiverDialog.PacketBufferSize.Label" ) );
+   props.setLook( wlPacketBufferSize );
+   FormData fdlPacketBufferSize = new FormData();
+   fdlPacketBufferSize.top = new FormAttachment( lastControl, margin  );
+   fdlPacketBufferSize.left = new FormAttachment( 0, 0 );
+   fdlPacketBufferSize.right = new FormAttachment( middle, -margin );
+   wlPacketBufferSize.setLayoutData( fdlPacketBufferSize );
+   m_wPacketBufferSize = new TextVar( transMeta, wAdvancedTabComp, SWT.SINGLE | SWT.LEFT
+     | SWT.BORDER );
+   props.setLook( m_wPacketBufferSize );
+   m_wPacketBufferSize.addModifyListener( lsMod );
+   FormData fdPacketBufferSize = new FormData();
+   fdPacketBufferSize.top = new FormAttachment( lastControl, margin );
+   fdPacketBufferSize.left = new FormAttachment( middle, 0 );
+   fdPacketBufferSize.right = new FormAttachment( 100, 0 );
+   m_wPacketBufferSize.setLayoutData( fdPacketBufferSize );
+   lastControl = m_wPacketBufferSize;
+
    Label wlBigEndian = new Label( wAdvancedTabComp, SWT.RIGHT );
    wlBigEndian.setText( BaseMessages
        .getString( UDPReceiverMeta.PKG,
@@ -555,6 +597,8 @@ public class UDPReceiverDialog extends BaseStepDialog implements StepDialogInter
 	   subscriberMeta.setBufferSize(m_wBufferSize.getText() );
 	   subscriberMeta.setInitPoolSize( m_wPoolInitSize.getText() );
 	   subscriberMeta.setMaxPoolSize(m_wPoolMaxSize.getText() );
+	   subscriberMeta.setThreadCount(m_wThreadCount.getText());
+	   subscriberMeta.setPacketBufferSize(m_wPacketBufferSize.getText());
 	   subscriberMeta.setBigEndian(m_wBigEndian.getSelection());
 	   subscriberMeta.setPassAsBinary(m_wPassBinary.getSelection());
 	   subscriberMeta.setRepeatingGroups(m_wRepeatingGroups.getSelection());
@@ -632,6 +676,8 @@ public class UDPReceiverDialog extends BaseStepDialog implements StepDialogInter
    m_wBufferSize.setText( Const.NVL( subscriberMeta.getBufferSize(), "0" ) );
    m_wPoolInitSize.setText( Const.NVL( subscriberMeta.getInitPoolSize(), "0" ) );
    m_wPoolMaxSize.setText( Const.NVL( subscriberMeta.getMaxPoolSize(), "0" ) );
+   m_wThreadCount.setText( Const.NVL( subscriberMeta.getThreadCount(), "0" ) );
+   m_wPacketBufferSize.setText( Const.NVL( subscriberMeta.getPacketBufferSize(), "0" ) );
    m_wBigEndian.setSelection(subscriberMeta.getBigEndian());
    m_wRepeatingGroups.setSelection(subscriberMeta.getRepeatingGroups());
    m_wPassBinary.setSelection(subscriberMeta.getPassAsBinary());

@@ -65,6 +65,8 @@ public class UDPReceiverMeta
   private String m_bufferSize = "512";
   private String m_initPoolSize = "100";
   private String m_maxPoolSize = "200";
+  private String m_threadCount = "5";
+  private String m_packetBufferSize = "1024";
   private String m_passAsBinary = (new Boolean(false).toString());
   private String m_repeatingGroups = (new Boolean(false).toString());
   private String m_bigEndian = (new Boolean(true)).toString();
@@ -96,6 +98,18 @@ public class UDPReceiverMeta
 	  }
   }
   
+  public String getThreadCount() {
+  	  return m_threadCount;
+  }
+  public void setThreadCount(String threadCount) {
+	  m_threadCount = threadCount;
+  }
+  public String getPacketBufferSize() {
+  	  return m_packetBufferSize;
+  }
+  public void setPacketBufferSize(String packetBufferSize) {
+	  m_packetBufferSize = packetBufferSize;
+  }
   public String getBufferSize() {
   	  return m_bufferSize;
   }
@@ -171,6 +185,8 @@ public class UDPReceiverMeta
       m_bufferSize = "512";
       m_initPoolSize = "100";
       m_maxPoolSize = "512";
+      m_threadCount = "5";
+      m_packetBufferSize = "1024";
       m_bigEndian = (new Boolean(true)).toString();
       m_passAsBinary = (new Boolean(false)).toString();
       m_repeatingGroups = (new Boolean(false)).toString();
@@ -203,6 +219,8 @@ public class UDPReceiverMeta
 	  m_initPoolSize = XMLHandler.getTagValue( stepnode, "INITPOOLSIZE");	
 	  m_maxPoolSize = XMLHandler.getTagValue( stepnode, "MAXPOOLSIZE");	
 	  m_bigEndian = XMLHandler.getTagValue(stepnode,  "BIG_ENDIAN");
+	  m_threadCount = XMLHandler.getTagValue(stepnode, "THREAD_COUNT");
+	  m_packetBufferSize = XMLHandler.getTagValue(stepnode, "PACKET_BUFFER_SIZE");
 	  m_passAsBinary = getTagValue(stepnode, "PASS_AS_BINARY", new Boolean(false).toString());
 	  m_repeatingGroups = getTagValue(stepnode, "REPEATING_GROUPS", new Boolean(false).toString());
 	  String strFieldNames = XMLHandler.getTagValue( stepnode, "FIELD_NAMES");
@@ -242,6 +260,12 @@ public class UDPReceiverMeta
     if ( !Const.isEmpty( m_bigEndian ) ) {
         retval.append( "    " ).append( XMLHandler.addTagValue( "BIG_ENDIAN", m_bigEndian ) );
       }
+    if ( !Const.isEmpty( m_threadCount ) ) {
+        retval.append( "    " ).append( XMLHandler.addTagValue( "THREAD_COUNT", m_threadCount ) );
+      }
+    if ( !Const.isEmpty( m_packetBufferSize ) ) {
+        retval.append( "    " ).append( XMLHandler.addTagValue( "PACKET_BUFFER_SIZE", m_packetBufferSize ) );
+      }
     if ( !Const.isEmpty( m_passAsBinary ) ) {
         retval.append( "    " ).append( XMLHandler.addTagValue( "PASS_AS_BINARY", m_passAsBinary ) );
       }
@@ -276,6 +300,8 @@ public class UDPReceiverMeta
 	    m_initPoolSize = rep.getStepAttributeString( stepId, "INITPOOLSIZE" );    
 	    m_maxPoolSize = rep.getStepAttributeString( stepId, "MAXPOOLSIZE" );    
 	    m_bigEndian = rep.getStepAttributeString( stepId, "BIG_ENDIAN" );    
+	    m_threadCount = rep.getStepAttributeString(stepId, "THREAD_COUNT");
+	    m_packetBufferSize = rep.getStepAttributeString(stepId, "PACKET_BUFFER_SIZE");
 	    m_passAsBinary = readRepValue(rep, stepId, "PASS_AS_BINARY", new Boolean(false).toString());
 	    m_repeatingGroups = readRepValue(rep, stepId, "REPEATING_GROUPS", new Boolean(false).toString());
 		  String strFieldNames = rep.getStepAttributeString( stepId, "FIELD_NAMES");
@@ -313,6 +339,12 @@ public class UDPReceiverMeta
 	      }
 	    if ( !Const.isEmpty( m_bigEndian ) ) {
 	        rep.saveStepAttribute( transformationId, stepId, "BIG_ENDIAN", m_bigEndian );
+	      }
+	    if ( !Const.isEmpty( m_threadCount ) ) {
+	        rep.saveStepAttribute( transformationId, stepId, "THREAD_COUNT", m_threadCount );
+	      }
+	    if ( !Const.isEmpty( m_packetBufferSize ) ) {
+	        rep.saveStepAttribute( transformationId, stepId, "PACKET_BUFFER_SIZE", m_packetBufferSize );
 	      }
 	    if ( !Const.isEmpty( m_passAsBinary ) ) {
 	        rep.saveStepAttribute( transformationId, stepId, "PASS_AS_BINARY", m_passAsBinary );

@@ -265,6 +265,36 @@ public class UDPReceiverStep extends BaseStep implements StepInterface {
 			logBasic("Max Object Pool size is " + sMaxPoolSize + " objects");
 			data.m_receiver.setPoolMaxSize(maxPoolSize);
 
+			String sThreadCount = environmentSubstitute(meta.getThreadCount());
+			if (Const.isEmpty(sThreadCount)) {
+				throw new KettleException(
+						BaseMessages.getString(UDPReceiverMeta.PKG, "UDPReceiverStep.Error.NoThreadCount"));
+			}
+			int threadCount = 5;
+			try {
+				threadCount = Integer.parseInt(sThreadCount);
+			} catch (NumberFormatException ex) {
+				throw new KettleException(BaseMessages.getString(UDPReceiverMeta.PKG,
+						"UDPReceiverStep.Error.BadThreadCount", sThreadCount));
+			}
+			logBasic("Thread count is " + sThreadCount + " threads");
+			data.m_receiver.setThreadCount(threadCount);
+
+			String sPacketBufferSize = environmentSubstitute(meta.getPacketBufferSize());
+			if (Const.isEmpty(sPacketBufferSize)) {
+				throw new KettleException(
+						BaseMessages.getString(UDPReceiverMeta.PKG, "UDPReceiverStep.Error.NoPacketBufferSize"));
+			}
+			int packetBufferSize = 1024;
+			try {
+				packetBufferSize = Integer.parseInt(sPacketBufferSize);
+			} catch (NumberFormatException ex) {
+				throw new KettleException(BaseMessages.getString(UDPReceiverMeta.PKG,
+						"UDPReceiverStep.Error.BadPacketBufferSize", sPacketBufferSize));
+			}
+			logBasic("Packet buffer size " + sPacketBufferSize + " bytes per packet");
+			data.m_receiver.setPacketBufferSize(packetBufferSize);
+
 		}
 	}
 
